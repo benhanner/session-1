@@ -45,6 +45,25 @@ app.get('/api/items', (req, res) => {
 });
 
 app.post('/api/items', (req, res) => {
+
+// Delete item by id
+app.delete('/api/items/:id', (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: 'Invalid item id' });
+    }
+    const deleteStmt = db.prepare('DELETE FROM items WHERE id = ?');
+    const result = deleteStmt.run(id);
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting item:', error);
+    res.status(500).json({ error: 'Failed to delete item' });
+  }
+});
   try {
     const { name } = req.body;
     
